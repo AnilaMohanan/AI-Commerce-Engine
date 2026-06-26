@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import Product from "../models/Product";
 import redisClient from "../config/redis";
 
@@ -58,6 +59,112 @@ export const createProduct = async (req: any, res: any) => {
     await redisClient.del("products:all");
 
     res.status(201).json(product);
+  } catch (error) {
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
+export const searchProducts = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const {
+      keyword,
+      category,
+      minPrice,
+      maxPrice,
+      sort,
+      page = "1",
+      limit = "10",
+      inStock,
+    } = req.query;
+
+    const query: any = {};
+
+    // Keyword Search
+    if (keyword) {
+      query.$or = [
+        {
+          name: {
+            $regex: keyword,
+            $options: "i",
+          },
+        },
+        {
+          description: {
+            $regex: keyword,
+            $options: "i",
+          },
+        },
+      ];
+    }
+
+    // Category Filter
+    if (category) {
+      query.category = category;
+    }
+
+    // Price Filter
+    if (minPrice || maxPrice) {
+      query.price = {};
+
+      if (minPrice) {
+        query.price.$gte = Number(minPrice);
+      }
+
+      if (maxPrice) {
+        query.price.$lte = Number(maxPrice);
+      }
+    }
+
+    // Stock Filter
+    if (inStock === "true") {
+      query.stock = { $gt: 0 };
+    }
+
+    let productQuery = Product.find(query);
+
+    // Sorting
+    if (sort) {
+      productQuery = productQuery.sort(sort as string);
+    } else {
+      productQuery = productQuery.sort("-createdAt");
+    }
+
+    const pageNumber = Number(page);
+    const pageSize = Number(limit);
+
+    const totalResults = await Product.countDocuments(query);
+
+    const products = await productQuery
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+
+    res.status(200).json({
+      currentPage: pageNumber,
+      totalPages: Math.ceil(totalResults / pageSize),
+      totalResults,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
+export const getProductById = async (req: Request, res: Response) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json(product);
   } catch (error) {
     res.status(500).json({
       message: "Server Error",

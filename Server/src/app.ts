@@ -4,7 +4,7 @@ import connectDB from "./config/db";
 import { connectRedis } from "./config/redis";
 import authRoutes from "./routes/authRoutes"; 
 import productRoutes from "./routes/productRoutes";
-
+import categoryRoutes from "./routes/categoryRoutes";
 
 dotenv.config();
 
@@ -15,7 +15,9 @@ const app = express();
 
 app.use(express.json());
 app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
 app.use("/api/auth", authRoutes);
+
 
 
 app.get("/", (req, res) => {
