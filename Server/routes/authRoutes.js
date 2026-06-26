@@ -58,4 +58,77 @@ router.post("/register", async (req, res) => {
   }
 });
 
+//Get Userby Id//
+
+// GET USER BY ID
+
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "User fetched successfully",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
+
+//user put//
+
+router.put("/:id", async (req, res) => {
+  try {
+    const { name, email, password, phone, address } = req.body;
+
+    const updateData = {
+      name,
+      email,
+      phone,
+      address,
+    };
+
+    // Hash password only if provided
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
+
+
 module.exports = router;
