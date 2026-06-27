@@ -80,7 +80,18 @@ export const searchProducts = async (
       limit = "10",
       inStock,
     } = req.query;
+// Create cache key 
+const cacheKey = `search:${JSON.stringify(req.query)}`;
+  // Check Redis
+  const cachedData = await redisClient.get(cacheKey);
 
+if (cachedData) {
+  console.log("Serving search results from Redis");
+
+  return res.status(200).json(JSON.parse(cachedData));
+}
+
+// If not found in Redis,continue with MongoDB
     const query: any = {};
 
     // Keyword Search
@@ -142,12 +153,25 @@ export const searchProducts = async (
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
-    res.status(200).json({
-      currentPage: pageNumber,
-      totalPages: Math.ceil(totalResults / pageSize),
-      totalResults,
-      products,
-    });
+    const response = {
+  success: true,
+  message: "Products fetched successfully",
+  data: {
+    currentPage: pageNumber,
+    totalPages: Math.ceil(totalResults / pageSize),
+    totalResults,
+    products,
+  },
+};
+await redisClient.setEx(
+  cacheKey,
+  300, // Cache for 5 minutes
+  JSON.stringify(response)
+);
+
+console.log("Serving search results from MongoDB");
+return res.status(200).json(response);
+
   } catch (error) {
     res.status(500).json({
       message: "Server Error",
