@@ -5,6 +5,8 @@ import { generateEmbedding } from "../services/embeddingService";
 
 export const getProducts = async (req: any, res: any) => {
   try {
+    await redisClient.del("products:all");
+
     const cachedProducts = await redisClient.get("products:all");
 
     if (cachedProducts) {
@@ -12,13 +14,15 @@ export const getProducts = async (req: any, res: any) => {
       return res.json(JSON.parse(cachedProducts));
     }
 
-    const products = await Product.find();
+    const products = await Product.find().populate("category", 
+      "name decription image");
 
-await redisClient.setEx(
-  "products:all",
-  3600,
-  JSON.stringify(products)
-);
+    await redisClient.setEx(
+      "products:all",
+      3600,
+      JSON.stringify(products)
+    );
+
     console.log("Serving from MongoDB");
 
     res.json(products);
@@ -77,8 +81,10 @@ export const searchProducts = async (
       minPrice,
       maxPrice,
       sort,
+      fields,
       page = "1",
       limit = "10",
+
       inStock,
     } = req.query;
 // Create cache key 
@@ -138,6 +144,11 @@ if (cachedData) {
 
     let productQuery = Product.find(query);
 
+    if (fields) {
+  const selectedFields = (fields as string).split(",").join(" ");
+  productQuery = productQuery.select(selectedFields);
+}
+
     // Sorting
     if (sort) {
       productQuery = productQuery.sort(sort as string);
@@ -181,7 +192,8 @@ return res.status(200).json(response);
 };
 export const getProductById = async (req: Request, res: Response) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id)
+  .populate("category", "name");
 
     if (!product) {
       return res.status(404).json({
