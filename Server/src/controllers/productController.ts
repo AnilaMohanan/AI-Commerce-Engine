@@ -249,7 +249,7 @@ export const vectorSearchProducts = async (
           path: "embeddings",
           queryVector: embedding,
           numCandidates: 100,
-          limit: 10,
+          limit: 100,
           filter,
         },
       },
@@ -293,3 +293,4 @@ export const vectorSearchProducts = async (
     });
   }
 };
+

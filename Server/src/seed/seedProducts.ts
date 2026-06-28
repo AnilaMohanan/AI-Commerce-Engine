@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import Product from "../models/Product";
+import axios from "axios";
 
 const seedProducts = async () => {
   try {
