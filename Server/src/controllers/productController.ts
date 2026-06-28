@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Product from "../models/Product";
 import redisClient from "../config/redis";
+import { generateEmbedding } from "../services/embeddingService";
 
 export const getProducts = async (req: any, res: any) => {
   try {
@@ -152,8 +153,7 @@ if (cachedData) {
     const products = await productQuery
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
-
-    const response = {
+      const response = {
   success: true,
   message: "Products fetched successfully",
   data: {
@@ -163,15 +163,16 @@ if (cachedData) {
     products,
   },
 };
+
 await redisClient.setEx(
   cacheKey,
-  300, // Cache for 5 minutes
+  300,
   JSON.stringify(response)
 );
 
 console.log("Serving search results from MongoDB");
-return res.status(200).json(response);
 
+return res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
       message: "Server Error",
@@ -192,6 +193,103 @@ export const getProductById = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       message: "Server Error",
+    });
+  }
+};
+export const vectorSearchProducts = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { query, category, maxPrice } = req.body;
+
+    // Check if query is provided
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        message: "Query is required",
+      });
+    }
+
+    // Redis Cache Key
+    const cacheKey = `vector-search:${JSON.stringify(req.body)}`;
+
+    // Check Redis Cache
+    const cachedData = await redisClient.get(cacheKey);
+
+    if (cachedData) {
+      console.log("Serving vector search from Redis");
+
+      return res.status(200).json(JSON.parse(cachedData));
+    }
+
+    // Generate Embedding
+    const embedding = (await generateEmbedding(query)) as number[];
+
+    console.log("Embedding Dimensions:", embedding.length);
+
+    // Hybrid Filters
+    const filter: any = {};
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (maxPrice) {
+      filter.price = {
+        $lte: Number(maxPrice),
+      };
+    }
+
+    // MongoDB Vector Search
+    const results = await Product.aggregate([
+      {
+        $vectorSearch: {
+          index: "vector_index",
+          path: "embeddings",
+          queryVector: embedding,
+          numCandidates: 100,
+          limit: 10,
+          filter,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          description: 1,
+          price: 1,
+          category: 1,
+          stock: 1,
+          image: 1,
+          score: {
+            $meta: "vectorSearchScore",
+          },
+        },
+      },
+    ]);
+
+    // Response
+    const response = {
+      success: true,
+      message: "Vector search completed successfully",
+      results,
+    };
+
+    // Save to Redis (5 minutes)
+    await redisClient.setEx(
+      cacheKey,
+      300,
+      JSON.stringify(response)
+    );
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Vector search failed",
     });
   }
 };

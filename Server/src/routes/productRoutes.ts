@@ -1,4 +1,5 @@
 import express from "express";
+import { vectorSearchProducts } from "../controllers/productController";
 import {
   getProducts,
   getProductById,
@@ -16,6 +17,8 @@ const router = express.Router();
 router.get("/", getProducts);
 
 router.get("/search", searchProducts);
+
+router.post("/vector-search", vectorSearchProducts);
 
 router.get("/:id", getProductById);
 
