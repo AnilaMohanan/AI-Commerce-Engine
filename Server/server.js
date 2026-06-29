@@ -7,6 +7,7 @@ const productRoutes = require("./routes/productRoutes");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 app.use(express.json());
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/orders", orderRoutes);
 
 
 
