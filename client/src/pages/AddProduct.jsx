@@ -1,23 +1,97 @@
 function AddProduct() {
   return (
-    <div>
-      <h1>Add Product</h1>
+    <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-8">
 
-      <form>
-        <input type="text" placeholder="Product Name" />
-        <br />
-        <br />
+      <h1 className="text-3xl font-bold mb-6">
+        Add New Product
+      </h1>
 
-        <input type="number" placeholder="Price" />
-        <br />
-        <br />
+      <form className="space-y-5">
 
-        <input type="number" placeholder="Stock" />
-        <br />
-        <br />
+        <div>
+          <label className="block font-medium mb-2">
+            Product Name
+          </label>
 
-        <button type="submit">Add Product</button>
+          <input
+            type="text"
+            placeholder="Enter product name"
+            className="w-full border rounded-lg p-3"
+          />
+        </div>
+
+        <div>
+          <label className="block font-medium mb-2">
+            Category
+          </label>
+
+          <input
+            type="text"
+            placeholder="Enter category"
+            className="w-full border rounded-lg p-3"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-5">
+
+          <div>
+            <label className="block font-medium mb-2">
+              Price
+            </label>
+
+            <input
+              type="number"
+              placeholder="Enter price"
+              className="w-full border rounded-lg p-3"
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium mb-2">
+              Stock
+            </label>
+
+            <input
+              type="number"
+              placeholder="Enter stock"
+              className="w-full border rounded-lg p-3"
+            />
+          </div>
+
+        </div>
+
+        <div>
+          <label className="block font-medium mb-2">
+            Description
+          </label>
+
+          <textarea
+            rows="4"
+            placeholder="Enter product description"
+            className="w-full border rounded-lg p-3"
+          ></textarea>
+        </div>
+
+        <div>
+          <label className="block font-medium mb-2">
+            Product Image URL
+          </label>
+
+          <input
+            type="text"
+            placeholder="Paste image URL"
+            className="w-full border rounded-lg p-3"
+          />
+        </div>
+
+        <button
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+        >
+          Add Product
+        </button>
+
       </form>
+
     </div>
   );
 }
