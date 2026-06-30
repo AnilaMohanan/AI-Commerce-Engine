@@ -8,6 +8,8 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const wishlistRoutes = require("./routes/wishlistRoutes");
+
 
 const app = express();
 app.use(express.json());
@@ -15,14 +17,11 @@ app.use(express.json());
 
 
 app.use("/auth", authRoutes);
-app.use("/api/categories", categoryRoutes);
+app.use("/categories", categoryRoutes);
 app.use("/orders", orderRoutes);
-
-
-
-
-
+app.use("/wishlist",wishlistRoutes);
 app.use("/products", productRoutes);
+
 connectDB();
 
 (async () => {
