@@ -1,26 +1,10 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import Sidebar from "./components/Sidebar";
-
-import Dashboard from "./pages/Dashboard";
-import Products from "./pages/Products";
-import AddProduct from "./pages/AddProduct";
-
 function App() {
   return (
-    <BrowserRouter>
-      <div className="app">
-        <Sidebar />
-
-        <div className="content">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/add-product" element={<AddProduct />} />
-          </Routes>
-        </div>
-      </div>
-    </BrowserRouter>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <h1 className="text-5xl font-bold text-blue-600">
+        Tailwind CSS is Working 🚀
+      </h1>
+    </div>
   );
 }
 
