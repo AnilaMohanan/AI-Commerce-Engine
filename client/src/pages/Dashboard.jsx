@@ -1,4 +1,5 @@
 import StatsCard from "../components/StatsCard";
+import ProductTable from "../components/ProductTable";
 
 function Dashboard() {
   return (
@@ -17,15 +18,7 @@ function Dashboard() {
         <StatsCard title="🛒 Orders" value="250" />
       </div>
 
-      <div className="mt-10 bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-2xl font-semibold mb-4">
-          Recent Products
-        </h2>
-
-        <p className="text-gray-500">
-          Product table will be displayed here.
-        </p>
-      </div>
+      <ProductTable />
     </div>
   );
 }
