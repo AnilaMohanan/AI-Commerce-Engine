@@ -1,38 +1,55 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Sidebar() {
   return (
-    <div className="w-64 min-h-screen bg-slate-900 text-white p-6">
-
-      <h1 className="text-3xl font-bold mb-10">
+    <div className="w-64 h-screen bg-slate-900 text-white p-6">
+      <h1 className="text-2xl font-bold mb-10">
         🛒 AI Commerce
       </h1>
 
-      <nav className="space-y-4">
+      <nav className="flex flex-col gap-4">
 
-        <Link
+        <NavLink
           to="/"
-          className="block p-3 rounded-lg hover:bg-slate-700 transition"
+          end
+          className={({ isActive }) =>
+            `p-3 rounded-lg transition ${
+              isActive
+                ? "bg-blue-600"
+                : "hover:bg-slate-700"
+            }`
+          }
         >
-          🏠 Dashboard
-        </Link>
+          📊 Dashboard
+        </NavLink>
 
-        <Link
+        <NavLink
           to="/products"
-          className="block p-3 rounded-lg hover:bg-slate-700 transition"
+          className={({ isActive }) =>
+            `p-3 rounded-lg transition ${
+              isActive
+                ? "bg-blue-600"
+                : "hover:bg-slate-700"
+            }`
+          }
         >
           📦 Products
-        </Link>
+        </NavLink>
 
-        <Link
+        <NavLink
           to="/add-product"
-          className="block p-3 rounded-lg hover:bg-slate-700 transition"
+          className={({ isActive }) =>
+            `p-3 rounded-lg transition ${
+              isActive
+                ? "bg-blue-600"
+                : "hover:bg-slate-700"
+            }`
+          }
         >
           ➕ Add Product
-        </Link>
+        </NavLink>
 
       </nav>
-
     </div>
   );
 }
