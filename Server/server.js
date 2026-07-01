@@ -6,7 +6,7 @@ const redisClient = require("./config/redis");
 const productRoutes = require("./routes/productRoutes");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
-const categoryRoutes = require("./routes/categoryRoutes");
+const categoryRoutes = require(".routes/categoryRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 
