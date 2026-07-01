@@ -1,30 +1,23 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 function Products() {
-  const products = [
-    {
-      id: 1,
-      image: "🧥",
-      name: "Winter Jacket",
-      category: "Clothing",
-      price: "₹2999",
-      stock: 50,
-    },
-    {
-      id: 2,
-      image: "👟",
-      name: "Running Shoes",
-      category: "Footwear",
-      price: "₹1999",
-      stock: 30,
-    },
-    {
-      id: 3,
-      image: "👕",
-      name: "T-Shirt",
-      category: "Clothing",
-      price: "₹799",
-      stock: 0,
-    },
-  ];
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/products"
+        );
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div>
@@ -40,7 +33,7 @@ function Products() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b text-left">
@@ -56,40 +49,50 @@ function Products() {
           <tbody>
             {products.map((product) => (
               <tr
-                key={product.id}
+                key={product._id}
                 className="border-b hover:bg-gray-100 transition"
               >
-                <td className="p-3 text-3xl">{product.image}</td>
-
-                <td className="p-3 font-medium">
-                  {product.name}
+                <td className="p-3">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-14 h-14 rounded-lg object-cover"
+                  />
                 </td>
 
-                <td className="p-3">
-                  {product.category}
-                </td>
+                <td className="p-3 font-medium">{product.name}</td>
 
                 <td className="p-3">
-                  {product.price}
+                  {product.category?.name || "N/A"}
                 </td>
 
-                <td className="p-3">
-                  {product.stock}
-                </td>
+                <td className="p-3">₹{product.price}</td>
+
+                <td className="p-3">{product.stock}</td>
 
                 <td className="p-3">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600">
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2">
                     Edit
                   </button>
 
-                  <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                  <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
                     Delete
                   </button>
                 </td>
               </tr>
             ))}
-          </tbody>
 
+            {products.length === 0 && (
+              <tr>
+                <td
+                  colSpan="6"
+                  className="text-center p-6 text-gray-500"
+                >
+                  No products found.
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
     </div>
