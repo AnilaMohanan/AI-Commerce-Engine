@@ -3,6 +3,7 @@ import axios from "axios";
 
 function Products() {
   const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -19,6 +20,10 @@ function Products() {
     fetchProducts();
   }, []);
 
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
       {/* Heading */}
@@ -28,6 +33,8 @@ function Products() {
         <input
           type="text"
           placeholder="🔍 Search Product..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="border rounded-lg px-4 py-2 w-72"
         />
       </div>
@@ -47,42 +54,42 @@ function Products() {
           </thead>
 
           <tbody>
-            {products.map((product) => (
-              <tr
-                key={product._id}
-                className="border-b hover:bg-gray-100 transition"
-              >
-                <td className="p-3">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-14 h-14 rounded-lg object-cover"
-                  />
-                </td>
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <tr
+                  key={product._id}
+                  className="border-b hover:bg-gray-100 transition"
+                >
+                  <td className="p-3">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-14 h-14 rounded-lg object-cover"
+                    />
+                  </td>
 
-                <td className="p-3 font-medium">{product.name}</td>
+                  <td className="p-3 font-medium">{product.name}</td>
 
-                <td className="p-3">
-                  {product.category?.name || "N/A"}
-                </td>
+                  <td className="p-3">
+                    {product.category?.name || "N/A"}
+                  </td>
 
-                <td className="p-3">₹{product.price}</td>
+                  <td className="p-3">₹{product.price}</td>
 
-                <td className="p-3">{product.stock}</td>
+                  <td className="p-3">{product.stock}</td>
 
-                <td className="p-3">
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2">
-                    Edit
-                  </button>
+                  <td className="p-3">
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2">
+                      Edit
+                    </button>
 
-                  <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-
-            {products.length === 0 && (
+                    <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
                 <td
                   colSpan="6"
