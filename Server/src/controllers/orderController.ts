@@ -2,13 +2,14 @@ import { Request, Response } from "express";
 import Cart from "../models/Cart";
 import Order from "../models/Order";
 import Product from "../models/Product";
+import Coupon from "../models/Coupon";
 
 export const checkout = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const { userId } = req.body;
+    const { userId, couponCode } = req.body;
 
     const cartItems = await Cart.find({
       user: userId,
@@ -60,12 +61,57 @@ export const checkout = async (
         )
         .toFixed(2)
     );
+    let finalAmount = totalAmount;
+let appliedCoupon = null;
+let discount = 0;
 
-    const order = await Order.create({
-      user: userId,
-      items: availableItems,
-      totalAmount,
+if (couponCode) {
+  const coupon = await Coupon.findOne({
+    code: couponCode.toUpperCase(),
+  });
+
+  if (!coupon) {
+    return res.status(404).json({
+      success: false,
+      message: "Coupon not found",
     });
+  }
+
+  if (!coupon.isActive) {
+    return res.status(400).json({
+      success: false,
+      message: "Coupon is inactive",
+    });
+  }
+
+  if (new Date() > coupon.expiryDate) {
+    return res.status(400).json({
+      success: false,
+      message: "Coupon has expired",
+    });
+  }
+
+  if (totalAmount < coupon.minimumOrderAmount) {
+    return res.status(400).json({
+      success: false,
+      message: `Minimum order amount is ₹${coupon.minimumOrderAmount}`,
+    });
+  }
+
+  if (coupon.discountType === "Percentage") {
+    discount = (totalAmount * coupon.discountValue) / 100;
+  } else {
+    discount = coupon.discountValue;
+  }
+
+  finalAmount = Number((totalAmount - discount).toFixed(2));
+  appliedCoupon = coupon.code;
+}
+    const order = await Order.create({
+  user: userId,
+  items: availableItems,
+  totalAmount: finalAmount,
+});
 
     // Reduce product stock
     for (const item of availableItems) {
