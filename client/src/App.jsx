@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
+import Categories from "./pages/Categories";
 import AddProduct from "./pages/AddProduct";
 
 function App() {
@@ -14,12 +15,12 @@ function App() {
         <Sidebar />
 
         <main className="flex-1 p-8">
+          <Navbar />
 
-  <Navbar />
-
-  <Routes>
+          <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/categories" element={<Categories />} />
             <Route path="/add-product" element={<AddProduct />} />
           </Routes>
         </main>

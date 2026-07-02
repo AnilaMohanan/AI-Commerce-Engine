@@ -37,6 +37,19 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
+          to="/categories"
+          className={({ isActive }) =>
+            `p-3 rounded-lg transition ${
+              isActive
+                ? "bg-blue-600"
+                : "hover:bg-slate-700"
+            }`
+          }
+        >
+          📂 Categories
+        </NavLink>
+
+        <NavLink
           to="/add-product"
           className={({ isActive }) =>
             `p-3 rounded-lg transition ${
