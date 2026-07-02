@@ -3,19 +3,19 @@ import Product from "../models/Product";
 import redisClient from "../config/redis";
 import { generateEmbedding } from "../services/embeddingService";
 
-export const getProducts = async (req: any, res: any) => {
+export const getProducts = async (req: Request, res: Response) => {
   try {
-    await redisClient.del("products:all");
-
     const cachedProducts = await redisClient.get("products:all");
 
     if (cachedProducts) {
       console.log("Serving from Redis Cache");
-      return res.json(JSON.parse(cachedProducts));
+      return res.status(200).json(JSON.parse(cachedProducts));
     }
 
-    const products = await Product.find().populate("category", 
-      "name decription image");
+    const products = await Product.find().populate(
+      "category",
+      "name description image"
+    );
 
     await redisClient.setEx(
       "products:all",
@@ -25,11 +25,17 @@ export const getProducts = async (req: any, res: any) => {
 
     console.log("Serving from MongoDB");
 
-    res.json(products);
+    return res.status(200).json(products);
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    console.error("GET PRODUCTS ERROR:", error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
   }
 };
+
+    
     export const updateProduct = async (req: any, res: any) => {
   try {
     await Product.findByIdAndUpdate(req.params.id, req.body);
@@ -65,10 +71,12 @@ export const createProduct = async (req: any, res: any) => {
 
     res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({
-      message: "Server Error",
-    });
-  }
+  console.error("GET PRODUCTS ERROR:", error);
+
+  res.status(500).json({
+    message: "Server Error",
+  });
+}
 };
 export const searchProducts = async (
   req: Request,
