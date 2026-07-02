@@ -80,4 +80,14 @@ router.post("/", async (req, res) => {
   }
 });
 
+//GET ORDER DETAILS
+const {
+  getOrderById,
+} = require("../controllers/orderController");
+
+router.get("/getOrder/:id", getOrderById);
+
+
+
+
 module.exports = router;
