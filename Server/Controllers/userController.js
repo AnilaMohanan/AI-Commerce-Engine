@@ -1,93 +1,98 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const bcrypt = require("bcryptjs");
 
-const router = express.Router();
+// ===========================
+// Register User
+// ===========================
 
-/*
-POST /api/auth/register
-*/
-
-router.post("/register", async (req, res) => {
+exports.registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
-    // Validation
+    const { name, email, password, phone, address } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
-        message: "All fields are required"
+        success: false,
+        message: "Name, email and password are required",
       });
     }
-
-    // Check existing user
 
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       return res.status(400).json({
-        message: "User already exists"
+        success: false,
+        message: "User already exists",
       });
     }
 
-    // Hash password
-
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
 
     const user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      phone,
+      address,
     });
 
     res.status(201).json({
+      success: true,
       message: "User registered successfully",
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+      },
     });
 
   } catch (error) {
     res.status(500).json({
-      message: error.message
+      success: false,
+      message: error.message,
     });
   }
-});
+};
 
-//Get Userby Id//
 
-// GET USER BY ID
+// ===========================
+// Get User By ID
+// ===========================
 
-router.get("/:id", async (req, res) => {
+exports.getUserById = async (req, res) => {
   try {
+
     const user = await User.findById(req.params.id).select("-password");
 
     if (!user) {
       return res.status(404).json({
+        success: false,
         message: "User not found",
       });
     }
 
     res.status(200).json({
-      message: "User fetched successfully",
+      success: true,
       user,
     });
+
   } catch (error) {
     res.status(500).json({
-      error: error.message,
+      success: false,
+      message: error.message,
     });
   }
-});
+};
 
 
-//user put//
+// ===========================
+// Update User
+// ===========================
 
-router.put("/:id", async (req, res) => {
+exports.updateUser = async (req, res) => {
   try {
+
     const { name, email, password, phone, address } = req.body;
 
     const updateData = {
@@ -97,7 +102,6 @@ router.put("/:id", async (req, res) => {
       address,
     };
 
-    // Hash password only if provided
     if (password) {
       updateData.password = await bcrypt.hash(password, 10);
     }
@@ -113,22 +117,21 @@ router.put("/:id", async (req, res) => {
 
     if (!updatedUser) {
       return res.status(404).json({
+        success: false,
         message: "User not found",
       });
     }
 
     res.status(200).json({
+      success: true,
       message: "User updated successfully",
       user: updatedUser,
     });
 
   } catch (error) {
     res.status(500).json({
-      error: error.message,
+      success: false,
+      message: error.message,
     });
   }
-});
-
-
-
-module.exports = router;
+};
