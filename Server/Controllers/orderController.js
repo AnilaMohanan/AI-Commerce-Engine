@@ -1,14 +1,114 @@
 const Order = require("../models/Order");
+const User = require("../models/User");
+const Product = require("../models/Product");
 
-// GET ORDER BY ID
-
-const getOrderById = async (req, res) => {
+// ==============================
+// Place Order
+// ==============================
+exports.placeOrder = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { user, items } = req.body;
 
-    const order = await Order.findById(id)
+    if (!user || !items || items.length === 0) {
+      return res.status(400).json({
+        message: "User and order items are required",
+      });
+    }
+
+    // Check User
+    const existingUser = await User.findById(user);
+
+    if (!existingUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    let totalAmount = 0;
+    const orderItems = [];
+
+    for (const item of items) {
+      const product = await Product.findById(item.product);
+
+      if (!product) {
+        return res.status(404).json({
+          message: `Product not found : ${item.product}`,
+        });
+      }
+
+      if (product.stock < item.quantity) {
+        return res.status(400).json({
+          message: `${product.title} is out of stock`,
+        });
+      }
+
+      totalAmount += product.price * item.quantity;
+
+      orderItems.push({
+        product: product._id,
+        quantity: item.quantity,
+        price: product.price,
+      });
+
+      product.stock -= item.quantity;
+      await product.save();
+    }
+
+    const order = await Order.create({
+      user,
+      items: orderItems,
+      totalAmount,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Order placed successfully",
+      order,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ==============================
+// Get All Orders
+// ==============================
+
+exports.getAllOrders = async (req, res) => {
+  try {
+
+    const orders = await Order.find()
       .populate("user", "name email")
-      .populate("products.product", "name price image");
+      .populate("items.product", "title price");
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      orders,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ==============================
+// Get Order By Id
+// ==============================
+
+exports.getOrderById = async (req, res) => {
+  try {
+
+    const order = await Order.findById(req.params.id)
+      .populate("user", "name email")
+      .populate("items.product", "title price");
 
     if (!order) {
       return res.status(404).json({
@@ -19,9 +119,9 @@ const getOrderById = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Order fetched successfully",
-      data: order,
+      order,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -30,6 +130,29 @@ const getOrderById = async (req, res) => {
   }
 };
 
-module.exports = {
-  getOrderById,
+// ==============================
+// Get Orders By User
+// ==============================
+
+exports.getOrdersByUser = async (req, res) => {
+  try {
+
+    const orders = await Order.find({
+      user: req.params.userId,
+    })
+      .populate("user", "name email")
+      .populate("items.product", "title price");
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      orders,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

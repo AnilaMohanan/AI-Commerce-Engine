@@ -33,12 +33,12 @@ const orderSchema = new mongoose.Schema(
     },
  shippingAddress: {
       type: String,
-      required: true,
+      required: false,
     },
 
     paymentMethod: {
       type: String,
-      required: true,
+      required: false,
     },
     status: {
       type: String,
