@@ -10,6 +10,7 @@ import orderRoutes from "./routes/orderRoutes";
 import couponRoutes from "./routes/couponRoutes";
 import analyticsRoutes from "./routes/analyticsRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
+import reviewRoutes from "./routes/reviewRoutes";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server Running");
