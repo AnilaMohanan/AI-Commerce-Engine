@@ -1,24 +1,28 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Products() {
+  const navigate = useNavigate();
+
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/api/products"
-        );
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-
     fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/products"
+      );
+
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase())
@@ -26,9 +30,10 @@ function Products() {
 
   return (
     <div>
-      {/* Heading */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Products</h1>
+        <h1 className="text-3xl font-bold">
+          Products
+        </h1>
 
         <input
           type="text"
@@ -39,7 +44,6 @@ function Products() {
         />
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -68,20 +72,32 @@ function Products() {
                     />
                   </td>
 
-                  <td className="p-3 font-medium">{product.name}</td>
+                  <td className="p-3 font-medium">
+                    {product.name}
+                  </td>
 
                   <td className="p-3">
                     {product.category?.name || "N/A"}
                   </td>
 
-                  <td className="p-3">₹{product.price}</td>
-
-                  <td className="p-3">{product.stock}</td>
+                  <td className="p-3">
+                    ₹{product.price}
+                  </td>
 
                   <td className="p-3">
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2">
-                      Edit
-                    </button>
+                    {product.stock}
+                  </td>
+
+                  <td className="p-3">
+                    <button
+  onClick={() => {
+    alert(product._id);
+    navigate(`/edit-product/${product._id}`);
+  }}
+  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2"
+>
+  Edit
+</button>
 
                     <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
                       Delete
