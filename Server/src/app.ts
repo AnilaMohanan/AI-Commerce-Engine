@@ -11,6 +11,10 @@ import couponRoutes from "./routes/couponRoutes";
 import analyticsRoutes from "./routes/analyticsRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
 import reviewRoutes from "./routes/reviewRoutes";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import cors from "cors";
+import errorHandler from "./middleware/errorHandler";
 
 dotenv.config();
 
@@ -18,8 +22,25 @@ connectDB();
 connectRedis();
 
 const app = express();
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: {
+    success: false,
+    message: "Too many requests. Please try again later.",
+  },
+});
 
+app.use(helmet());
+app.use(limiter);
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Frontend URL (change later if needed)
+    credentials: true,
+  })
+);
 app.use(express.json());
+
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/auth", authRoutes);
@@ -29,6 +50,7 @@ app.use("/api/coupons", couponRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use(errorHandler);
 
 app.get("/", (req, res) => {
   res.send("Server Running");
