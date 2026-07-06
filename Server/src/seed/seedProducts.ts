@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import Product from "../models/Product";
 import Category from "../models/Category";
-import axios from "axios";
+import { generateEmbedding } from "../services/embeddingService";
 
 const seedProducts = async () => {
   try {
@@ -15,13 +15,25 @@ const seedProducts = async () => {
       const randomCategory =
         categories[Math.floor(Math.random() * categories.length)];
 
+      const name = faker.commerce.productName();
+      const description = faker.commerce.productDescription();
+
+      // Generate AI Embedding
+      const embeddings = await generateEmbedding(
+        `${name} ${description}`
+      );
+
       products.push({
-        name: faker.commerce.productName(),
-        description: faker.commerce.productDescription(),
+        name,
+        description,
         price: Number(faker.commerce.price()),
         category: randomCategory._id,
-        stock: faker.number.int({ min: 1, max: 100 }),
+        stock: faker.number.int({
+          min: 1,
+          max: 100,
+        }),
         image: faker.image.url(),
+        embeddings,
       });
     }
 

@@ -150,8 +150,10 @@ if (cachedData) {
       query.stock = { $gt: 0 };
     }
 
-    let productQuery = Product.find(query);
-
+   let productQuery = Product.find(query).populate(
+  "category",
+  "name description image"
+);
     if (fields) {
   const selectedFields = (fields as string).split(",").join(" ");
   productQuery = productQuery.select(selectedFields);
