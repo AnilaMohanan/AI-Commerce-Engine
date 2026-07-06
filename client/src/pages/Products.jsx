@@ -24,12 +24,47 @@ function Products() {
     }
   };
 
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.delete(
+        `http://localhost:5000/api/products/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Product deleted successfully!");
+
+setProducts((prevProducts) =>
+  prevProducts.filter((product) => product._id !== id)
+);
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error.response?.data?.message ||
+          "Failed to delete product."
+      );
+    }
+  };
+
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div>
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">
           Products
@@ -44,6 +79,7 @@ function Products() {
         />
       </div>
 
+      {/* Product Table */}
       <div className="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -90,16 +126,20 @@ function Products() {
 
                   <td className="p-3">
                     <button
-  onClick={() => {
-    alert(product._id);
-    navigate(`/edit-product/${product._id}`);
-  }}
-  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2"
->
-  Edit
-</button>
+                      onClick={() =>
+                        navigate(`/edit-product/${product._id}`)
+                      }
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2"
+                    >
+                      Edit
+                    </button>
 
-                    <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+                    <button
+                      onClick={() =>
+                        handleDelete(product._id)
+                      }
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    >
                       Delete
                     </button>
                   </td>
