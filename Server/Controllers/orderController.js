@@ -156,3 +156,229 @@ exports.getOrdersByUser = async (req, res) => {
     });
   }
 };
+
+// Total Revenue
+
+exports.getTotalRevenue = async (req, res) => {
+  try {
+
+    const revenue = await Order.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalRevenue: {
+            $sum: "$totalAmount"
+          },
+          totalOrders: {
+            $sum: 1
+          }
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      analytics: revenue[0] || {
+        totalRevenue: 0,
+        totalOrders: 0
+      }
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+};
+
+
+// ORDER PER DAY//
+
+exports.getOrdersPerDay = async (req, res) => {
+  try {
+
+    const orders = await Order.aggregate([
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$createdAt"
+            }
+          },
+          totalOrders: {
+            $sum: 1
+          },
+          revenue: {
+            $sum: "$totalAmount"
+          }
+        }
+      },
+      {
+        $sort: {
+          _id: 1
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      orders
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+};
+
+// BEST SELLING PRODUCTS //
+
+exports.getBestSellingProducts = async (req, res) => {
+  try {
+
+    const products = await Order.aggregate([
+
+      {
+        $unwind: "$items"
+      },
+
+      {
+        $group: {
+          _id: "$items.product",
+          totalSold: {
+            $sum: "$items.quantity"
+          }
+        }
+      },
+
+      {
+        $sort: {
+          totalSold: -1
+        }
+      },
+
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+
+      {
+        $unwind: "$product"
+      },
+
+      {
+        $project: {
+          _id: 0,
+          productId: "$product._id",
+          title: "$product.title",
+          price: "$product.price",
+          totalSold: 1
+        }
+      }
+
+    ]);
+
+    res.status(200).json({
+      success: true,
+      products
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+};
+
+//assumes each product has a category field referencing the Category collection.
+
+exports.getTopCategories = async (req, res) => {
+  try {
+
+    const categories = await Order.aggregate([
+
+      {
+        $unwind: "$items"
+      },
+
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+
+      {
+        $unwind: "$product"
+      },
+
+      {
+        $group: {
+          _id: "$product.category",
+          totalSold: {
+            $sum: "$items.quantity"
+          }
+        }
+      },
+
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "_id",
+          as: "category"
+        }
+      },
+
+      {
+        $unwind: "$category"
+      },
+
+      {
+        $project: {
+          _id: 0,
+          categoryId: "$category._id",
+          categoryName: "$category.name",
+          totalSold: 1
+        }
+      },
+
+      {
+        $sort: {
+          totalSold: -1
+        }
+      }
+
+    ]);
+
+    res.status(200).json({
+      success: true,
+      categories
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+};

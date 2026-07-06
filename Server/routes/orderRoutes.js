@@ -7,6 +7,10 @@ const {
   getAllOrders,
   getOrderById,
   getOrdersByUser,
+  getTotalRevenue,
+  getOrdersPerDay,
+ getTopCategories,
+  getBestSellingProducts
 } = require("../controllers/orderController");
 
 // Place Order
@@ -18,7 +22,19 @@ router.get("/", getAllOrders);
 // Get Orders of a User
 router.get("/user/:userId", getOrdersByUser);
 
+
+
+
+router.get("/get-totalrevenue", getTotalRevenue);
+
+router.get("/get-orders-per-day", getOrdersPerDay);
+
+router.get("/top-categories", getTopCategories);
+
+router.get("/best-selling-products", getBestSellingProducts);
+
 // Get Order By Id
 router.get("/:id", getOrderById);
+
 
 module.exports = router;

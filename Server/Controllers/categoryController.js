@@ -42,26 +42,36 @@ exports.addCategory = async (req, res) => {
     });
   }
 };
-// ===============================
-// Get All Categories
-// ===============================
 
+// Get All Categories
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find().sort({ createdAt: -1 });
+
+    const categories = await Category.find();
+
+  /*  if (categories.length === 0) {
+      return res.status(404).json({
+        message: "No categories found"
+      });
+    }*/
 
     res.status(200).json({
-      success: true,
-      count: categories.length,
-      categories,
+      success:true,
+      message: "Categories retrieved successfully",
+      totalCategories: categories.length,
+      categories
     });
+
   } catch (error) {
+
     res.status(500).json({
-      success: false,
-      message: error.message,
+      error: error.message
     });
+
   }
 };
+
+
 // ===============================
 // View Category By ID
 // ===============================
