@@ -62,6 +62,19 @@ function Sidebar() {
           ➕ Add Product
         </NavLink>
 
+        <NavLink
+          to="/ai-search"
+          className={({ isActive }) =>
+            `p-3 rounded-lg transition ${
+              isActive
+                ? "bg-blue-600"
+                : "hover:bg-slate-700"
+            }`
+          }
+        >
+          🤖 AI Search
+        </NavLink>
+
       </nav>
     </div>
   );

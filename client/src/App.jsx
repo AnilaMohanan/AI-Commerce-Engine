@@ -8,6 +8,7 @@ import Products from "./pages/Products";
 import Categories from "./pages/Categories";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
+import AISearch from "./pages/AISearch";
 import Login from "./pages/Login";
 
 function DashboardLayout() {
@@ -26,6 +27,10 @@ function DashboardLayout() {
           <Route
             path="/edit-product/:id"
             element={<EditProduct />}
+          />
+          <Route
+            path="/ai-search"
+            element={<AISearch />}
           />
         </Routes>
       </main>
