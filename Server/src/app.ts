@@ -15,6 +15,8 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 import errorHandler from "./middleware/errorHandler";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swagger";
 
 dotenv.config();
 
@@ -40,7 +42,7 @@ app.use(
   })
 );
 app.use(express.json());
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/auth", authRoutes);

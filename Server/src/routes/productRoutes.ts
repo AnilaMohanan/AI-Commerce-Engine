@@ -13,7 +13,18 @@ import { protect } from "../middleware/authMiddleware";
 import { admin } from "../middleware/adminMiddleware";
 
 const router = express.Router();
+/**
+ * @swagger
+ * /api/products:
+ *   get:
+ *     summary: Get all products
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: List of all products
+ */
 
+ 
 router.get("/", getProducts);
 
 router.get("/search", searchProducts);
