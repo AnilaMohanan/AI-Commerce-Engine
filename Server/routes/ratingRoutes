@@ -1,0 +1,21 @@
+const express = require("express");
+
+const router = express.Router();
+
+const {
+  addRating,
+  getProductRatings,
+  getAverageRating,
+} = require("../controllers/ratingController");
+
+
+// Add Rating
+router.post("/", addRating);
+
+// Get All Ratings of Product
+router.get("/product/:productId", getProductRatings);
+
+// Get Average Rating
+router.get("/average/:productId", getAverageRating);
+
+module.exports = router;

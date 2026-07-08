@@ -12,6 +12,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const userRoutes = require("./routes/userRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const ratingRoutes = require("./routes/ratingRoutes");
 
 const app = express();
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use("/wishlist",wishlistRoutes);
 app.use("/products", productRoutes);
 app.use("/users", userRoutes);
 app.use("/reviews", reviewRoutes);
+app.use("/ratings", ratingRoutes);
 
 connectDB();
 
