@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { sendEmail } from "../services/emailService";
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
@@ -20,6 +21,17 @@ export const registerUser = async (req: Request, res: Response) => {
       email,
       password,
     });
+    await sendEmail(
+  user.email,
+  "Welcome to AI-Commerce",
+  `Hi ${user.name},
+
+Welcome to AI-Commerce!
+
+Your account has been created successfully.
+
+Happy Shopping!`
+);
 
     res.status(201).json({
       message: "User registered successfully",
