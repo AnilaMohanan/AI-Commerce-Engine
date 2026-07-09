@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const cors = require("cors");
 const connectDB = require("./config/db");
 const redisClient = require("./config/redis");
 const productRoutes = require("./routes/productRoutes");
@@ -14,8 +15,13 @@ const userRoutes = require("./routes/userRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
 
+
+
+
 const app = express();
+app.use(cors());
 app.use(express.json());
+//app.use(express.json());
 
 
 app.use("/categories", categoryRoutes);
