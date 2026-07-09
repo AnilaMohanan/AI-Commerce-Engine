@@ -17,6 +17,7 @@ import cors from "cors";
 import errorHandler from "./middleware/errorHandler";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger";
+import uploadRoutes from "./routes/uploadRoutes";
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ app.use("/api/coupons", couponRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/upload", uploadRoutes);
 app.use(errorHandler);
 
 app.get("/", (req, res) => {
