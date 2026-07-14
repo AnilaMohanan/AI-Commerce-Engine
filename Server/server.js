@@ -1,10 +1,10 @@
+console.log("Server.js started");
 require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const redisClient = require("./config/redis");
-const productRoutes = require("./routes/productRoutes");
 const mongoose = require("mongoose");
 //const authRoutes = require("./routes/authRoutes");
 
@@ -14,6 +14,7 @@ const wishlistRoutes = require("./routes/wishlistRoutes");
 const userRoutes = require("./routes/userRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
+const productRoutes = require("./routes/productRoutes");
 
 
 
@@ -31,6 +32,9 @@ app.use("/products", productRoutes);
 app.use("/users", userRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/ratings", ratingRoutes);
+
+
+
 
 connectDB();
 

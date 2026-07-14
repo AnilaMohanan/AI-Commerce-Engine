@@ -82,20 +82,38 @@ exports.getAllOrders = async (req, res) => {
   try {
 
     const orders = await Order.find()
-      .populate("user", "name email")
-      .populate("items.product", "title price");
+      .populate("user", "name")
+      .populate("items.product", "name");
+
+    const formattedOrders = orders.map(order => ({
+      orderId: order._id,
+      userId: order.user?._id,
+      userName: order.user?.name,
+
+      products: order.items.map(item => ({
+        productId: item.product?._id,
+        productName: item.product?.name,
+        quantity: item.quantity
+      })),
+
+      totalAmount: order.totalAmount,
+      status: order.status,
+      createdAt: order.createdAt
+    }));
 
     res.status(200).json({
       success: true,
-      count: orders.length,
-      orders,
+      count: formattedOrders.length,
+      orders: formattedOrders
     });
 
   } catch (error) {
+
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message
     });
+
   }
 };
 
