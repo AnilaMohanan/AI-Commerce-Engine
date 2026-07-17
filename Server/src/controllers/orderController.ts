@@ -203,6 +203,7 @@ export const cancelOrder = async (
           },
         }
       );
+      
     }
 
     order.status = "Cancelled";
@@ -219,6 +220,37 @@ export const cancelOrder = async (
     return res.status(500).json({
       success: false,
       message: "Failed to cancel order",
+    });
+  }
+};
+export const getInvoice = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId)
+      .populate("items.product")
+      .populate("user", "name email");
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch invoice",
     });
   }
 };

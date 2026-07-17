@@ -10,7 +10,7 @@ function Sidebar() {
       <nav className="flex flex-col gap-4">
 
         <NavLink
-          to="/"
+          to="/admin"
           end
           className={({ isActive }) =>
             `p-3 rounded-lg transition ${
@@ -24,7 +24,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/products"
+          to="/admin/products"
           className={({ isActive }) =>
             `p-3 rounded-lg transition ${
               isActive
@@ -37,7 +37,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/categories"
+          to="/admin/categories"
           className={({ isActive }) =>
             `p-3 rounded-lg transition ${
               isActive
@@ -50,7 +50,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/add-product"
+          to="/admin/add-product"
           className={({ isActive }) =>
             `p-3 rounded-lg transition ${
               isActive
@@ -63,7 +63,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/ai-search"
+          to="/admin/ai-search"
           className={({ isActive }) =>
             `p-3 rounded-lg transition ${
               isActive
@@ -73,6 +73,15 @@ function Sidebar() {
           }
         >
           🤖 AI Search
+        </NavLink>
+
+        <hr className="my-4 border-slate-700" />
+
+        <NavLink
+          to="/"
+          className="p-3 rounded-lg bg-green-600 hover:bg-green-700 transition"
+        >
+          🛍️ Customer Store
         </NavLink>
 
       </nav>

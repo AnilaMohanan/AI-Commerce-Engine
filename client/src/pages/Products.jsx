@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useCart } from "../context/CartContext";
+import { addToCart as addToCartAPI } from "../api/cartApi";
 
 function Products() {
   const navigate = useNavigate();
+const { addToCart } = useCart();
+const user = JSON.parse(localStorage.getItem("user"));
 
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
@@ -23,6 +27,23 @@ function Products() {
       console.error("Error fetching products:", error);
     }
   };
+  const handleAddToCart = async (product) => {
+  try {
+    await addToCartAPI({
+      userId: user._id,
+      productId: product._id,
+      quantity: 1,
+    });
+
+    // Keep local cart updated
+    addToCart(product);
+
+    alert("Product added to cart successfully!");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to add product to cart.");
+  }
+};
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
@@ -125,24 +146,31 @@ setProducts((prevProducts) =>
                   </td>
 
                   <td className="p-3">
-                    <button
-                      onClick={() =>
-                        navigate(`/edit-product/${product._id}`)
-                      }
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2"
-                    >
-                      Edit
-                    </button>
+  <button
+    onClick={() => handleAddToCart(product)}
+    className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2"
+  >
+    🛒 Cart
+  </button>
 
-                    <button
-                      onClick={() =>
-                        handleDelete(product._id)
-                      }
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
+  <button
+    onClick={() =>
+      navigate(`/edit-product/${product._id}`)
+    }
+    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2"
+  >
+    Edit
+  </button>
+
+  <button
+    onClick={() =>
+      handleDelete(product._id)
+    }
+    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+  >
+    Delete
+  </button>
+</td>
                 </tr>
               ))
             ) : (

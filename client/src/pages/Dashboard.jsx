@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { getDashboardStats } from "../api/dashboardApi";
 
 import StatsCard from "../components/StatsCard";
 import ProductTable from "../components/ProductTable";
@@ -14,6 +15,12 @@ function Dashboard() {
     totalStock: 0,
     lowStock: 0,
   });
+  const [adminStats, setAdminStats] = useState({
+  totalOrders: 0,
+  totalUsers: 0,
+  totalRevenue: 0,
+  recentOrders: [],
+});
 
   const [barChartData, setBarChartData] = useState({
     labels: [],
@@ -103,7 +110,14 @@ function Dashboard() {
           (product) => product.stock
         ),
       });
+const dashboard = await getDashboardStats();
 
+setAdminStats({
+  totalOrders: dashboard.stats.totalOrders,
+  totalUsers: dashboard.stats.totalUsers,
+  totalRevenue: dashboard.stats.totalRevenue,
+  recentOrders: dashboard.stats.recentOrders,
+});
     } catch (error) {
       console.error("Dashboard Error:", error);
     }
@@ -121,6 +135,24 @@ function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+
+  <StatsCard
+    title="🧾 Total Orders"
+    value={adminStats.totalOrders}
+  />
+
+  <StatsCard
+    title="👥 Total Users"
+    value={adminStats.totalUsers}
+  />
+
+  <StatsCard
+    title="💰 Revenue"
+    value={`₹${adminStats.totalRevenue}`}
+  />
+
+</div>
         <StatsCard
           title="📦 Total Products"
           value={stats.totalProducts}
@@ -154,14 +186,36 @@ function Dashboard() {
       </div>
 
       {/* Line Chart */}
-      <div className="bg-white rounded-xl shadow-lg p-6 mt-8">
-        <LineChart chartData={lineChartData} />
-      </div>
+<div className="bg-white rounded-xl shadow-lg p-6 mt-8">
+  <LineChart chartData={lineChartData} />
+</div>
 
-      {/* Product Table */}
-      <div className="mt-8">
-        <ProductTable />
+{/* Recent Orders */}
+<div className="bg-white rounded-xl shadow-lg p-6 mt-8">
+  <h2 className="text-2xl font-bold mb-4">
+    Recent Orders
+  </h2>
+
+  {adminStats.recentOrders.length === 0 ? (
+    <p>No recent orders.</p>
+  ) : (
+    adminStats.recentOrders.map((order) => (
+      <div
+        key={order._id}
+        className="flex justify-between border-b py-3"
+      >
+        <span>{order.user?.name || "Unknown User"}</span>
+        <span>₹{order.totalAmount}</span>
+        <span>{order.status}</span>
       </div>
+    ))
+  )}
+</div>
+
+{/* Product Table */}
+<div className="mt-8">
+  <ProductTable />
+</div>
     </div>
   );
 }

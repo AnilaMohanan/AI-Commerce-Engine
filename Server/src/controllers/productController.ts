@@ -5,23 +5,34 @@ import { generateEmbedding } from "../services/embeddingService";
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const cachedProducts = await redisClient.get("products:all");
+    // Try Redis first (don't fail if Redis is down)
+    try {
+      const cachedProducts = await redisClient.get("products:all");
 
-    if (cachedProducts) {
-      console.log("Serving from Redis Cache");
-      return res.status(200).json(JSON.parse(cachedProducts));
+      if (cachedProducts) {
+        console.log("Serving from Redis Cache");
+        return res.status(200).json(JSON.parse(cachedProducts));
+      }
+    } catch (redisError) {
+      console.log("Redis unavailable. Using MongoDB.");
     }
 
+    // Fetch from MongoDB
     const products = await Product.find().populate(
       "category",
       "name description image"
     );
 
-    await redisClient.setEx(
-      "products:all",
-      3600,
-      JSON.stringify(products)
-    );
+    // Save to Redis (ignore errors)
+    try {
+      await redisClient.setEx(
+        "products:all",
+        3600,
+        JSON.stringify(products)
+      );
+    } catch (redisError) {
+      console.log("Redis cache skipped.");
+    }
 
     console.log("Serving from MongoDB");
 
@@ -34,7 +45,6 @@ export const getProducts = async (req: Request, res: Response) => {
     });
   }
 };
-
     
     export const updateProduct = async (req: any, res: any) => {
   try {

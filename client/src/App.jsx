@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 
+import StoreLayout from "./layouts/StoreLayout";
+
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import Categories from "./pages/Categories";
@@ -10,6 +12,16 @@ import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import AISearch from "./pages/AISearch";
 import Login from "./pages/Login";
+import Invoice from "./pages/Invoice";
+
+// Store Pages
+import Home from "./pages/Home";
+import ProductDetails from "./pages/ProductDetails";
+import Cart from "./pages/Cart";
+import Wishlist from "./pages/Wishlist";
+import Checkout from "./pages/Checkout";
+import Orders from "./pages/Orders";
+import Profile from "./pages/Profile";
 
 function DashboardLayout() {
   return (
@@ -28,10 +40,7 @@ function DashboardLayout() {
             path="/edit-product/:id"
             element={<EditProduct />}
           />
-          <Route
-            path="/ai-search"
-            element={<AISearch />}
-          />
+          <Route path="/ai-search" element={<AISearch />} />
         </Routes>
       </main>
     </div>
@@ -43,13 +52,35 @@ function App() {
 
   return (
     <BrowserRouter>
-      {token ? (
-        <DashboardLayout />
-      ) : (
-        <Routes>
-          <Route path="*" element={<Login />} />
-        </Routes>
-      )}
+      <Routes>
+
+        {/* ---------------- CUSTOMER STORE ---------------- */}
+
+        <Route path="/" element={<StoreLayout />}>
+          <Route index element={<Home />} />
+          <Route path="product/:id" element={<ProductDetails />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="wishlist" element={<Wishlist />} />
+         <Route path="checkout" element={<Checkout />} />
+<Route path="orders" element={<Orders />} />
+<Route path="invoice/:orderId" element={<Invoice />} />
+<Route path="profile" element={<Profile />} />
+        </Route>
+
+        {/* ---------------- ADMIN ---------------- */}
+
+        <Route
+          path="/admin/*"
+          element={
+            token ? (
+              <DashboardLayout />
+            ) : (
+              <Login />
+            )
+          }
+        />
+
+      </Routes>
     </BrowserRouter>
   );
 }
