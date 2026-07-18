@@ -41,9 +41,25 @@ function Dashboard() {
         axios.get("http://localhost:5000/api/categories"),
       ]);
 
-      const products = productsRes.data;
-      const categories = categoriesRes.data;
+const products = productsRes.data.products || productsRes.data;
+const categories = categoriesRes.data.categories || categoriesRes.data;
+ 
+const totalStock = products.reduce(
+  (sum, product) => sum + Number(product.stock || 0),
+  0
+);
 
+const lowStock = products.filter(
+  (product) => Number(product.stock) < 10
+).length;
+
+setStats({
+  totalProducts: products.length,
+  totalCategories: categories.length,
+  totalStock,
+  lowStock,
+});
+/*
       const totalStock = products.reduce(
         (sum, product) => sum + product.stock,
         0
@@ -59,7 +75,7 @@ function Dashboard() {
         totalStock,
         lowStock,
       });
-
+*/
       // -------- Bar Chart --------
       const categoryCounts = {};
 
@@ -91,9 +107,15 @@ function Dashboard() {
       });
 
       // -------- Line Chart --------
-      const sortedProducts = [...products]
+     /* const sortedProducts = [...products]
         .sort((a, b) => a.name.localeCompare(b.name))
-        .slice(0, 10);
+        .slice(0, 10);*/
+
+        const sortedProducts = [...products]
+  .sort((a, b) =>
+    (a.name || "").localeCompare(b.name || "")
+  )
+  .slice(0, 10);
 
       setLineChartData({
         labels: sortedProducts.map(

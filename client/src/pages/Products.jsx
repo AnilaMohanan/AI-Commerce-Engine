@@ -58,10 +58,22 @@ setProducts((prevProducts) =>
     }
   };
 
-  const filteredProducts = products.filter((product) =>
+  /*const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase())
-  );
+  );*/
+const filteredProducts=products.filter(product =>
+  (product.name || "")
+    .toLowerCase()
+    .includes(search.toLowerCase()) ||
 
+  (product.category || "")
+    .toLowerCase()
+    .includes(search.toLowerCase()) ||
+
+  (product.brand || "")
+    .toLowerCase()
+    .includes(search.toLowerCase())
+)
   return (
     <div>
       {/* Header */}

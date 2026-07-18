@@ -25,13 +25,13 @@ app.use(express.json());
 //app.use(express.json());
 
 
-app.use("/categories", categoryRoutes);
-app.use("/orders", orderRoutes);
-app.use("/wishlist",wishlistRoutes);
-app.use("/products", productRoutes);
-app.use("/users", userRoutes);
-app.use("/reviews", reviewRoutes);
-app.use("/ratings", ratingRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/wishlist",wishlistRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/ratings", ratingRoutes);
 
 
 

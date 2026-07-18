@@ -12,7 +12,8 @@ function Categories() {
           "http://localhost:5000/api/categories"
         );
 
-        setCategories(response.data);
+        //setCategories(response.data);
+        setCategories(response.data.categories || []);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -21,10 +22,14 @@ function Categories() {
     fetchCategories();
   }, []);
 
-  const filteredCategories = categories.filter((category) =>
+  /*const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(search.toLowerCase())
-  );
-
+  );*/
+const filteredCategories = categories.filter((category) =>
+  (category.name || "")
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -57,7 +62,17 @@ function Categories() {
                   className="border-b hover:bg-gray-100"
                 >
                   <td className="p-3">
-                    {category.image}
+                    <td className="p-3">
+  {category.image ? (
+    <img
+      src={category.image}
+      alt={category.name}
+      className="w-12 h-12 object-cover rounded"
+    />
+  ) : (
+    "No Image"
+  )}
+</td>
                   </td>
 
                   <td className="p-3 font-medium">
