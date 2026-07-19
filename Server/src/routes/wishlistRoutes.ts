@@ -44,6 +44,6 @@ router.get("/:userId", getWishlist);
  *       200:
  *         description: Product removed from wishlist
  */
-router.delete("/", removeFromWishlist);
+router.delete("/:id", removeFromWishlist);
 
 export default router;

@@ -3,38 +3,61 @@ import Product from "../models/Product";
 import redisClient from "../config/redis";
 import { generateEmbedding } from "../services/embeddingService";
 
-export const getProducts = async (req: any, res: any) => {
+export const getProducts = async (req: Request, res: Response) => {
   try {
-    await redisClient.del("products:all");
+    const limit = req.query.limit
+      ? Number(req.query.limit)
+      : 0;
 
-    const cachedProducts = await redisClient.get("products:all");
+    const cacheKey = limit
+      ? `products:${limit}`
+      : "products:all";
 
-    if (cachedProducts) {
-      console.log("Serving from Redis Cache");
-      return res.json(JSON.parse(cachedProducts));
+    // Check Redis
+   // const cachedProducts = await redisClient.get(cacheKey);
+
+   // if (cachedProducts) {
+   //   console.log("Serving from Redis Cache");
+    //  return res
+    //    .status(200)
+     //   .json(JSON.parse(cachedProducts));
+    //}
+
+    let query = Product.find().populate(
+      "category",
+      "name"
+    );
+
+    if (limit > 0) {
+      query = query.limit(limit);
     }
 
-    const products = await Product.find().populate("category", 
-      "name decription image");
+    const products = await query;
 
-    await redisClient.setEx(
-      "products:all",
-      3600,
-      JSON.stringify(products)
-    );
+  //  await redisClient.setEx(
+  //    cacheKey,
+  //    3600,
+  //    JSON.stringify(products)
+  //  );
 
     console.log("Serving from MongoDB");
 
-    res.json(products);
+    return res.status(200).json(products);
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    console.error("GET PRODUCTS ERROR:", error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
   }
 };
+    
     export const updateProduct = async (req: any, res: any) => {
   try {
     await Product.findByIdAndUpdate(req.params.id, req.body);
 
     await redisClient.del("products:all");
+     await redisClient.del("products:8");
 
     res.json({ message: "Product updated and cache cleared" });
   } catch (error) {
@@ -47,6 +70,7 @@ export const deleteProduct = async (req: any, res: any) => {
     await Product.findByIdAndDelete(req.params.id);
 
     await redisClient.del("products:all");
+    await redisClient.del("products:8");
 
     res.json({
       message: "Product deleted and cache cleared",
@@ -62,13 +86,17 @@ export const createProduct = async (req: any, res: any) => {
     const product = await Product.create(req.body);
 
     await redisClient.del("products:all");
+    await redisClient.del("products:8");
+    
 
     res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({
-      message: "Server Error",
-    });
-  }
+  console.error("GET PRODUCTS ERROR:", error);
+
+  res.status(500).json({
+    message: "Server Error",
+  });
+}
 };
 export const searchProducts = async (
   req: Request,
@@ -142,8 +170,10 @@ if (cachedData) {
       query.stock = { $gt: 0 };
     }
 
-    let productQuery = Product.find(query);
-
+   let productQuery = Product.find(query).populate(
+  "category",
+  "name description image"
+);
     if (fields) {
   const selectedFields = (fields as string).split(",").join(" ");
   productQuery = productQuery.select(selectedFields);
