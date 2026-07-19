@@ -13,14 +13,21 @@ function Wishlist() {
   );
 
   useEffect(() => {
-    fetchWishlist();
+    if (user?._id) {
+      fetchWishlist();
+    }
   }, []);
 
   const fetchWishlist = async () => {
     try {
       const response = await getWishlist(user._id);
-console.log(response.wishlist);
-      setWishlist(response.wishlist || []);
+
+      // Remove invalid wishlist items
+      const wishlistItems = (response.wishlist || []).filter(
+        (item) => item.product
+      );
+
+      setWishlist(wishlistItems);
     } catch (error) {
       console.error(error);
     }
@@ -45,6 +52,8 @@ console.log(response.wishlist);
 
   const handleMoveToCart = async (item) => {
     try {
+      if (!item.product) return;
+
       await addToCart({
         userId: user._id,
         productId: item.product._id,
@@ -68,7 +77,6 @@ console.log(response.wishlist);
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-
       <h1 className="text-4xl font-bold mb-8">
         My Wishlist
       </h1>
@@ -79,50 +87,46 @@ console.log(response.wishlist);
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {wishlist
+            .filter((item) => item.product)
+            .map((item) => (
+              <div
+                key={item._id}
+                className="bg-white rounded-xl shadow-lg p-5"
+              >
+                <img
+                  src={item.product.image}
+                  alt={item.product.name}
+                  className="w-full h-48 object-cover rounded-lg"
+                />
 
-          {wishlist.map((item) => (
-            <div
-              key={item._id}
-              className="bg-white rounded-xl shadow-lg p-5"
-            >
-              <img
-                src={item.product.image}
-                alt={item.product.name}
-                className="w-full h-48 object-cover rounded-lg"
-              />
+                <h2 className="text-xl font-bold mt-4">
+                  {item.product.name}
+                </h2>
 
-              <h2 className="text-xl font-bold mt-4">
-                {item.product.name}
-              </h2>
+                <p className="text-blue-600 font-bold mt-2">
+                  ₹{item.product.price}
+                </p>
 
-              <p className="text-blue-600 font-bold mt-2">
-                ₹{item.product.price}
-              </p>
+                <div className="flex gap-2 mt-5">
+                  <button
+                    onClick={() => handleMoveToCart(item)}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg"
+                  >
+                    🛒 Move to Cart
+                  </button>
 
-              <div className="flex gap-2 mt-5">
-
-                <button
-                  onClick={() => handleMoveToCart(item)}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg"
-                >
-                  🛒 Move to Cart
-                </button>
-
-                <button
-                  onClick={() => handleRemove(item._id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 rounded-lg"
-                >
-                  Remove
-                </button>
-
+                  <button
+                    onClick={() => handleRemove(item._id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 rounded-lg"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
-
-            </div>
-          ))}
-
+            ))}
         </div>
       )}
-
     </div>
   );
 }

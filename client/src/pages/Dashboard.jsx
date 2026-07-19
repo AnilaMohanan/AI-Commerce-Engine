@@ -44,12 +44,14 @@ function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       const [productsRes, categoriesRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/products"),
+        axios.get("http://localhost:5000/api/products?limit=1000"),
         axios.get("http://localhost:5000/api/categories"),
       ]);
 
       const products = productsRes.data;
+      console. log(productsRes.data)
       const categories = categoriesRes.data;
+    
 
       const totalStock = products.reduce(
         (sum, product) => sum + product.stock,

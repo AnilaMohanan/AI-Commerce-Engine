@@ -15,11 +15,11 @@ function Home() {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/products"
+        "http://localhost:5000/api/products?limit=8"
       );
 
-      // Show only first 8 products
-      setProducts(response.data.slice(0, 8));
+      // Store only the first 8 products
+      setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
     }

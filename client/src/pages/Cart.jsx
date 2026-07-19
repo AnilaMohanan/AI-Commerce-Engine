@@ -8,11 +8,12 @@ import {
 } from "../api/cartApi";
 
 function Cart() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+
   const [cart, setCart] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   useEffect(() => {
     if (user?._id) {
@@ -24,7 +25,10 @@ function Cart() {
     try {
       const response = await getCart(user._id);
 
-      const cartItems = response.cart || [];
+      // Remove invalid cart items
+      const cartItems = (response.cart || []).filter(
+        (item) => item.product
+      );
 
       setCart(cartItems);
 
@@ -75,55 +79,57 @@ function Cart() {
       ) : (
         <>
           <div className="space-y-5">
-            {cart.map((item) => (
-              <div
-                key={item._id}
-                className="bg-white rounded-xl shadow p-5 flex justify-between items-center"
-              >
-                <div className="flex gap-5">
-                  <img
-                    src={item.product.image}
-                    alt={item.product.name}
-                    className="w-24 h-24 rounded-lg object-cover"
-                  />
+            {cart
+              .filter((item) => item.product)
+              .map((item) => (
+                <div
+                  key={item._id}
+                  className="bg-white rounded-xl shadow p-5 flex justify-between items-center"
+                >
+                  <div className="flex gap-5">
+                    <img
+                      src={item.product.image}
+                      alt={item.product.name}
+                      className="w-24 h-24 rounded-lg object-cover"
+                    />
 
-                  <div>
-                    <h2 className="font-bold text-xl">
-                      {item.product.name}
-                    </h2>
+                    <div>
+                      <h2 className="font-bold text-xl">
+                        {item.product.name}
+                      </h2>
 
-                    <p className="text-gray-500">
-                      ₹{item.product.price}
-                    </p>
+                      <p className="text-gray-500">
+                        ₹{item.product.price}
+                      </p>
 
-                    <div className="flex gap-3 mt-4">
-                      <button
-                        onClick={() => decrease(item)}
-                        className="px-3 py-1 bg-gray-200 rounded"
-                      >
-                        −
-                      </button>
+                      <div className="flex gap-3 mt-4">
+                        <button
+                          onClick={() => decrease(item)}
+                          className="px-3 py-1 bg-gray-200 rounded"
+                        >
+                          −
+                        </button>
 
-                      <span>{item.quantity}</span>
+                        <span>{item.quantity}</span>
 
-                      <button
-                        onClick={() => increase(item)}
-                        className="px-3 py-1 bg-gray-200 rounded"
-                      >
-                        +
-                      </button>
+                        <button
+                          onClick={() => increase(item)}
+                          className="px-3 py-1 bg-gray-200 rounded"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <button
-                  onClick={() => remove(item)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
+                  <button
+                    onClick={() => remove(item)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
           </div>
 
           <div className="bg-white rounded-xl shadow p-6 mt-8">
@@ -132,11 +138,11 @@ function Cart() {
             </h2>
 
             <button
-  onClick={() => navigate("/checkout")}
-  className="mt-5 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
->
-  Proceed to Checkout
-</button>
+              onClick={() => navigate("/checkout")}
+              className="mt-5 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
+            >
+              Proceed to Checkout
+            </button>
           </div>
         </>
       )}
