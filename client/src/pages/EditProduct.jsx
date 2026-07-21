@@ -84,7 +84,7 @@ function EditProduct() {
 
       alert("Product Updated Successfully!");
 
-      navigate("/products");
+      navigate("/admin/products");
     } catch (error) {
       console.error(error);
 

@@ -11,8 +11,8 @@ function Navbar() {
 
     alert("Logged out successfully!");
 
-    navigate("/");
-    window.location.reload();
+    navigate("/Login");
+   // window.location.reload();
   };
 
   return (

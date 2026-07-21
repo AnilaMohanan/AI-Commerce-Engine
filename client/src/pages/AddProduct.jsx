@@ -61,7 +61,7 @@ function AddProduct() {
 
       alert("Product Added Successfully!");
 
-      navigate("/products");
+      navigate("/admin/products");
     } catch (error) {
       console.error(error);
 
